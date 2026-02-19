@@ -160,7 +160,7 @@ export default function StudentsPage() {
                                 resetForm();
                                 setShowModal(true);
                             }}
-                            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition"
+                            className="flex items-center space-x-2 bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl font-medium transition"
                         >
                             <PlusIcon className="w-5 h-5" />
                             <span>Nuevo Estudiante</span>
@@ -189,10 +189,11 @@ export default function StudentsPage() {
 
                     {/* Table */}
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Nombre</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Nac.</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Padre</th>
@@ -204,7 +205,7 @@ export default function StudentsPage() {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {students.map((student) => (
                                     <tr key={student.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">
+                                        <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900 sticky left-0 bg-white z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.06)]">
                                             {student.nombre} {student.apellido}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-gray-700">
@@ -250,6 +251,7 @@ export default function StudentsPage() {
                                 ))}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -393,7 +395,7 @@ export default function StudentsPage() {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium"
+                                        className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-medium"
                                     >
                                         {editingStudent ? 'Actualizar' : 'Crear'}
                                     </button>
