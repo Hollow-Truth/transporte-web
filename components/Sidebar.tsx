@@ -111,7 +111,7 @@ export default function Sidebar({ user, onLogout }: SidebarProps) {
                                 href={link.href}
                                 onClick={() => setIsOpen(false)}
                                 className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors ${isActive
-                                    ? 'bg-blue-700 text-white'
+                                    ? 'bg-primary text-white'
                                     : 'text-gray-700 hover:bg-gray-50'
                                     }`}
                             >
