@@ -184,27 +184,32 @@ export default function UsersPage() {
                         </div>
 
                         {/* Filters */}
-                        <div className="flex flex-col lg:flex-row gap-4">
-                            <div className="flex-1 relative">
+                        <div className="flex flex-col gap-3">
+                            <div className="relative">
                                 <SearchIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
                                 <input
                                     type="text"
                                     placeholder="Buscar por nombre o email..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                                 />
                             </div>
-                            <select
-                                value={roleFilter}
-                                onChange={(e) => setRoleFilter(e.target.value)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="all">Todos los roles</option>
-                                <option value="admin">Admin</option>
-                                <option value="conductor">Conductor</option>
-                                <option value="padre">Padre</option>
-                            </select>
+                            <div className="flex flex-wrap gap-2">
+                                {(['all', 'admin', 'conductor', 'padre'] as const).map((role) => (
+                                    <button
+                                        key={role}
+                                        onClick={() => setRoleFilter(role)}
+                                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                                            roleFilter === role
+                                                ? 'bg-primary text-white'
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        }`}
+                                    >
+                                        {role === 'all' ? 'Todos' : role === 'admin' ? 'Admin' : role === 'conductor' ? 'Conductor' : 'Padre'}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
