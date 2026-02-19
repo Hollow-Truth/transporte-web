@@ -23,7 +23,7 @@ export default function LoginPage() {
         try {
             const response = await api.post('/auth/login', formData);
 
-            localStorage.setItem('access_token', response.data.access_token);
+            sessionStorage.setItem('access_token', response.data.access_token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
 
             router.push('/dashboard');

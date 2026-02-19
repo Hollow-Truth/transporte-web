@@ -4,7 +4,7 @@ let socket: Socket | null = null;
 
 export const getSocket = () => {
     if (!socket) {
-        const token = localStorage.getItem('access_token');
+        const token = sessionStorage.getItem('access_token');
 
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
         const socketUrl = apiUrl.replace('/api', '');
@@ -21,17 +21,9 @@ export const getSocket = () => {
             timeout: 10000,
         });
 
-        socket.on('connect', () => {
-            console.log('✅ WebSocket conectado');
-        });
-
-        socket.on('disconnect', () => {
-            console.log('❌ WebSocket desconectado');
-        });
-
-        socket.on('connect_error', (error) => {
-            console.error('Error de conexión WebSocket:', error);
-        });
+        socket.on('connect', () => { /* connected */ });
+        socket.on('disconnect', () => { /* disconnected */ });
+        socket.on('connect_error', () => { /* connection error - no log in production */ });
     }
 
     return socket;

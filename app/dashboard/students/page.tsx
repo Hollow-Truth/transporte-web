@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
-import { PlusIcon, PencilIcon, TrashIcon } from '@/components/icons';
+import { PlusIcon, PencilIcon, TrashIcon, LocationIcon, MapIcon, XIcon } from '@/components/icons';
 import dynamic from 'next/dynamic';
 import api from '@/lib/api';
 
@@ -59,8 +59,8 @@ export default function StudentsPage() {
             setStudents(studentsRes.data);
             setParents(usersRes.data.filter((u: User) => u.role === 'padre'));
             setRoutes(routesRes.data);
-        } catch (error) {
-            console.error('Error loading data:', error);
+        } catch {
+            // error loading data
         } finally {
             setLoading(false);
         }
@@ -130,7 +130,7 @@ export default function StudentsPage() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('access_token');
+        sessionStorage.removeItem('access_token');
         localStorage.removeItem('user');
         router.push('/login');
     };
@@ -213,8 +213,9 @@ export default function StudentsPage() {
                                         <td className="px-6 py-4 text-gray-700">
                                             {student.direccion}
                                             {student.latitud && (
-                                                <div className="text-xs text-blue-600 mt-1">
-                                                    📍 {student.latitud.toFixed(4)}, {student.longitud?.toFixed(4)}
+                                                <div className="flex items-center gap-1 text-xs text-blue-600 mt-1">
+                                                    <LocationIcon className="w-3 h-3" />
+                                                    {student.latitud.toFixed(4)}, {student.longitud?.toFixed(4)}
                                                 </div>
                                             )}
                                         </td>
@@ -349,12 +350,17 @@ export default function StudentsPage() {
                                             onClick={() => setShowMapPicker(true)}
                                             className="w-full flex items-center justify-center space-x-2 px-3 py-2.5 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:text-blue-600 transition"
                                         >
-                                            <span>
-                                                {formData.latitud && formData.longitud
-                                                    ? `📍 Ubicación seleccionada (${formData.latitud.toFixed(4)}, ${formData.longitud.toFixed(4)})`
-                                                    : '🗺️ Seleccionar ubicación en el mapa'
-                                                }
-                                            </span>
+                                            {formData.latitud && formData.longitud ? (
+                                                <>
+                                                    <LocationIcon className="w-4 h-4" />
+                                                    <span>Ubicación seleccionada ({formData.latitud.toFixed(4)}, {formData.longitud.toFixed(4)})</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <MapIcon className="w-4 h-4" />
+                                                    <span>Seleccionar ubicación en el mapa</span>
+                                                </>
+                                            )}
                                         </button>
                                     </div>
                                     <div className="col-span-2">
@@ -404,7 +410,7 @@ export default function StudentsPage() {
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden">
                         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
                             <h3 className="font-bold text-lg">Seleccionar Domicilio</h3>
-                            <button onClick={() => setShowMapPicker(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+                            <button onClick={() => setShowMapPicker(false)} className="text-gray-500 hover:text-gray-700"><XIcon className="w-5 h-5" /></button>
                         </div>
                         <div className="flex-1 relative">
                             <MapPicker

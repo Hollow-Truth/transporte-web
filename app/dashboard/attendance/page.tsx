@@ -96,7 +96,7 @@ export default function AttendancePage() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('access_token');
+        sessionStorage.removeItem('access_token');
         localStorage.removeItem('user');
         router.push('/login');
     };

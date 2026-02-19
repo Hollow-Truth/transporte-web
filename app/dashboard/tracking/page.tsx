@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Sidebar from '@/components/Sidebar';
 import { LocationIcon, TruckIcon, XIcon } from '@/components/icons';
-import { getSocket, disconnectSocket, type VehiclePosition } from '@/lib/socket';
+import { getSocket, type VehiclePosition } from '@/lib/socket';
 import api from '@/lib/api';
 import type { User, Vehicle } from '@/types';
 
@@ -82,7 +82,6 @@ export default function TrackingPage() {
                                 return newMap;
                             });
                             activeVehicleIdsRef.current.add(vehicle.id);
-                            console.log(`Posición inicial cargada para ${vehicle.placa}: ${lat}, ${lng}`);
                         }
                     }
                 } catch { /* sin última posición */ }
@@ -107,8 +106,8 @@ export default function TrackingPage() {
 
                 // Cargar posiciones activas via HTTP (fallback)
                 loadActivePositions(response.data);
-            } catch (error) {
-                console.error('Error loading vehicles:', error);
+            } catch {
+                // Error cargando vehiculos
             }
         })();
     }, [subscribeToVehicles, loadActivePositions]);
@@ -119,22 +118,17 @@ export default function TrackingPage() {
 
         const onConnect = () => {
             setIsConnected(true);
-            console.log('Conectado al servidor de tracking');
-            // Re-suscribir a todos los vehículos al reconectar
             if (vehicleIdsRef.current.length > 0) {
-                console.log('Re-suscribiendo a vehículos...');
                 subscribeToVehicles(vehicleIdsRef.current);
             }
         };
 
         const onDisconnect = () => {
             setIsConnected(false);
-            console.log('Desconectado del servidor de tracking');
         };
 
         // Escuchar actualizaciones de posición
         const onLocationUpdate = (data: any) => {
-            console.log('Posición recibida:', data);
 
             const vehiculoId = data.vehiculoId || data.vehicleId;
             if (!vehiculoId) return;
@@ -173,7 +167,6 @@ export default function TrackingPage() {
         const onTrajectoryEnded = (data: any) => {
             const vehiculoId = data.vehiculoId || data.vehicleId;
             if (!vehiculoId) return;
-            console.log('Trayectoria finalizada:', vehiculoId);
             activeVehicleIdsRef.current.delete(vehiculoId);
             setVehiclePositions((prev) => {
                 const newMap = new Map(prev);
@@ -193,11 +186,15 @@ export default function TrackingPage() {
         }
 
         return () => {
+            // Salir de todas las salas de vehiculos antes de limpiar
+            vehicleIdsRef.current.forEach((id) => {
+                socket.emit('leave:vehicle', { vehiculoId: id });
+            });
             socket.off('connect', onConnect);
             socket.off('disconnect', onDisconnect);
             socket.off('location:update', onLocationUpdate);
             socket.off('trajectory:ended', onTrajectoryEnded);
-            disconnectSocket();
+            // NO llamar disconnectSocket() - el socket es singleton compartido
         };
     }, [subscribeToVehicles]);
 
@@ -291,7 +288,7 @@ export default function TrackingPage() {
     }, [selectedVehicle, map, vehiclePositions]);
 
     const handleLogout = () => {
-        localStorage.removeItem('access_token');
+        sessionStorage.removeItem('access_token');
         localStorage.removeItem('user');
         router.push('/login');
     };
@@ -405,7 +402,7 @@ export default function TrackingPage() {
                     {/* Footer con instrucciones */}
                     <div className="p-4 border-t border-gray-200 bg-gray-50">
                         <p className="text-xs text-gray-600">
-                            💡 <strong>Tip:</strong> Haz clic en un vehículo para centrarlo en el mapa
+                            <strong>Tip:</strong> Haz clic en un vehículo para centrarlo en el mapa
                         </p>
                     </div>
                 </div>
