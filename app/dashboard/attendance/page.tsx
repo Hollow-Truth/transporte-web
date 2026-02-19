@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
+import { ClipboardIcon } from '@/components/icons';
 import api from '@/lib/api';
 import type { User, Route, Vehicle } from '@/types';
 
@@ -199,7 +200,7 @@ export default function AttendancePage() {
                             </div>
                         ) : !report?.registros.length ? (
                             <div className="p-12 text-center">
-                                <p className="text-4xl mb-3">📋</p>
+                                <ClipboardIcon className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                                 <p className="text-gray-500 font-medium">Sin registros de asistencia para esta fecha</p>
                             </div>
                         ) : (
