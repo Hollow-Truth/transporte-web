@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { HomeIcon, TruckIcon, MapIcon, AcademicCapIcon, UsersIcon, LocationIcon, ChartIcon, BellIcon, LogoutIcon, MenuIcon, XIcon } from './icons';
 import type { User } from '@/types';
 
