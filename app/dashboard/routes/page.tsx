@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
-import { PlusIcon, PencilIcon, TrashIcon, XIcon, MapIcon, EyeIcon } from '@/components/icons';
+import { PlusIcon, PencilIcon, TrashIcon, XIcon, MapIcon, EyeIcon, TruckIcon, AcademicCapIcon, LocationIcon, FlagIcon } from '@/components/icons';
 import api from '@/lib/api';
 import type { Route, Vehicle, User } from '@/types';
 import dynamic from 'next/dynamic';
@@ -205,10 +205,7 @@ export default function RoutesPage() {
                                 resetForm();
                                 setShowModal(true);
                             }}
-                            className="flex items-center space-x-2 text-white px-5 py-2.5 rounded-xl font-medium transition"
-                            style={{ backgroundColor: '#1e3a8a' }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e40af'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1e3a8a'}
+                            className="flex items-center space-x-2 bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl font-medium transition"
                         >
                             <PlusIcon className="w-5 h-5" />
                             <span>Nueva Ruta</span>
@@ -246,7 +243,10 @@ export default function RoutesPage() {
                                 </div>
 
                                 <div className="flex items-center justify-between mt-4 text-sm text-gray-500">
-                                    <span>{route.vehiculo ? `🚌 ${route.vehiculo.placa}` : '🚌 Sin vehículo'}</span>
+                                    <span className="flex items-center gap-1.5">
+                                        <TruckIcon className="w-4 h-4 text-gray-400 shrink-0" />
+                                        {route.vehiculo ? route.vehiculo.placa : 'Sin vehículo'}
+                                    </span>
                                     <span>{route.horaInicio} - {route.horaFin}</span>
                                 </div>
 
@@ -318,8 +318,9 @@ export default function RoutesPage() {
 
                             {/* Student List Sidebar */}
                             <div className="w-full md:w-80 bg-white rounded-xl shadow-sm border border-gray-200 p-4 overflow-y-auto max-h-[400px] md:max-h-full">
-                                <h4 className="font-bold text-gray-900 mb-3 flex items-center">
-                                    <span>👨‍🎓 Estudiantes ({viewRoute.estudiantes?.length || 0})</span>
+                                <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                    <AcademicCapIcon className="w-5 h-5 text-gray-500" />
+                                    <span>Estudiantes ({viewRoute.estudiantes?.length || 0})</span>
                                 </h4>
                                 {viewRoute.estudiantes && viewRoute.estudiantes.length > 0 ? (
                                     <ul className="space-y-2">
@@ -510,7 +511,7 @@ export default function RoutesPage() {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-1 py-3 px-4 bg-[#1e3a8a] text-white rounded-xl font-medium hover:bg-[#2d4ecf] transition shadow-lg shadow-blue-900/20"
+                                        className="flex-1 py-3 px-4 bg-primary hover:bg-primary-hover text-white rounded-xl font-medium transition shadow-lg shadow-blue-900/20"
                                     >
                                         {editingRoute ? 'Guardar Cambios' : 'Crear Ruta'}
                                     </button>
@@ -526,8 +527,11 @@ export default function RoutesPage() {
                 <div className="fixed inset-0 z-[1010] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col">
                         <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
-                            <h3 className="font-bold text-gray-900">
-                                {pickerType === 'inicio' ? '📍 Seleccionar Punto de Inicio' : '🏁 Seleccionar Punto de Destino'}
+                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                {pickerType === 'inicio'
+                                    ? <><LocationIcon className="w-5 h-5 text-green-600" /> Seleccionar Punto de Inicio</>
+                                    : <><FlagIcon className="w-5 h-5 text-red-500" /> Seleccionar Punto de Destino</>
+                                }
                             </h3>
                             <button onClick={() => setPickerType(null)} className="p-2 hover:bg-gray-200 rounded-full transition">
                                 <XIcon className="w-5 h-5 text-gray-500" />
