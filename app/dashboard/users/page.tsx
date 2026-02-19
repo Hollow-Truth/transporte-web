@@ -176,7 +176,7 @@ export default function UsersPage() {
                                     resetForm();
                                     setShowModal(true);
                                 }}
-                                className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+                                className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
                             >
                                 <PlusIcon className="w-5 h-5" />
                                 <span>Nuevo Usuario</span>
@@ -394,7 +394,7 @@ export default function UsersPage() {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
+                                    className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors"
                                 >
                                     {editingUser ? 'Actualizar' : 'Crear'}
                                 </button>

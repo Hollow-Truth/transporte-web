@@ -315,7 +315,7 @@ export default function TrackingPage() {
                 {/* Botón flotante para abrir panel en móvil */}
                 <button
                     onClick={() => setIsPanelOpen(true)}
-                    className="lg:hidden fixed bottom-6 right-6 bg-blue-700 text-white p-4 rounded-full shadow-lg z-[1000] flex items-center space-x-2"
+                    className="lg:hidden fixed bottom-6 right-6 bg-primary text-white p-4 rounded-full shadow-lg z-1000 flex items-center space-x-2"
                 >
                     <TruckIcon className="w-6 h-6" />
                     <span className="font-medium">{activeVehicles.length}</span>
