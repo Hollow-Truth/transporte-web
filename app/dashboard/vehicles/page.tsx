@@ -130,7 +130,7 @@ export default function VehiclesPage() {
                                 resetForm();
                                 setShowModal(true);
                             }}
-                            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition"
+                            className="flex items-center space-x-2 bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl font-medium transition"
                         >
                             <PlusIcon className="w-5 h-5" />
                             <span>Nuevo Vehículo</span>
@@ -139,10 +139,11 @@ export default function VehiclesPage() {
 
                     {/* Table */}
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Placa</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Placa</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca/Modelo</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Año</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacidad</th>
@@ -155,7 +156,7 @@ export default function VehiclesPage() {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {vehicles.map((vehicle) => (
                                     <tr key={vehicle.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{vehicle.placa}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900 sticky left-0 bg-white z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.06)]">{vehicle.placa}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-gray-700">{vehicle.marca} {vehicle.modelo}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-gray-700">{vehicle.año}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-gray-700">{vehicle.capacidad} personas</td>
@@ -193,6 +194,7 @@ export default function VehiclesPage() {
                                 ))}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -301,7 +303,7 @@ export default function VehiclesPage() {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium"
+                                        className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-medium"
                                     >
                                         {editingVehicle ? 'Actualizar' : 'Crear'}
                                     </button>
