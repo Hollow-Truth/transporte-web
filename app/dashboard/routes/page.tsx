@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 // Cargar MapPicker dinámicamente sin SSR
 const MapPicker = dynamic(() => import('@/components/MapPicker'), {
     ssr: false,
-    loading: () => <div className="h-[300px] w-full bg-gray-100 animate-pulse rounded-xl flex items-center justify-center">Cargando mapa...</div>
+    loading: () => <div className="h-75 w-full bg-gray-100 animate-pulse rounded-xl flex items-center justify-center">Cargando mapa...</div>
 });
 
 const RouteMapViewer = dynamic(() => import('@/components/RouteMapViewer'), {
@@ -78,9 +78,7 @@ export default function RoutesPage() {
             ]);
             setRoutes(routesRes.data);
             setVehicles(vehiclesRes.data);
-        } catch (error) {
-            console.error('Error loading data:', error);
-        } finally {
+        } catch { } finally {
             setLoading(false);
         }
     };
@@ -114,7 +112,6 @@ export default function RoutesPage() {
             resetForm();
             loadData();
         } catch (error: any) {
-            console.error('Error saving route:', error);
             alert(error.response?.data?.message || 'Error al guardar ruta');
         }
     };
@@ -143,7 +140,6 @@ export default function RoutesPage() {
             await api.delete(`/routes/${id}`);
             loadData();
         } catch (error: any) {
-            console.error('Error deleting route:', error);
             alert(error.response?.data?.message || 'Error al eliminar ruta');
         }
     };
@@ -227,14 +223,14 @@ export default function RoutesPage() {
 
                                 <div className="space-y-3 mb-4 border-t border-b border-gray-100 py-3">
                                     <div className="flex items-start">
-                                        <div className="mt-1 w-2 h-2 rounded-full bg-green-500 mr-2 flex-shrink-0"></div>
+                                        <div className="mt-1 w-2 h-2 rounded-full bg-green-500 mr-2 shrink-0"></div>
                                         <div>
                                             <p className="text-xs text-gray-500">Inicio</p>
                                             <p className="text-sm font-medium text-gray-900">{route.inicioNombre || 'Sin definir'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-start">
-                                        <div className="mt-1 w-2 h-2 rounded-full bg-red-500 mr-2 flex-shrink-0"></div>
+                                        <div className="mt-1 w-2 h-2 rounded-full bg-red-500 mr-2 shrink-0"></div>
                                         <div>
                                             <p className="text-xs text-gray-500">Destino</p>
                                             <p className="text-sm font-medium text-gray-900">{route.destinoNombre || 'Sin definir'}</p>
@@ -281,7 +277,7 @@ export default function RoutesPage() {
 
             {/* View Route Modal */}
             {viewRoute && (
-                <div className="fixed inset-0 z-[1010] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-1010 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden">
                         <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                             <div>
@@ -293,7 +289,7 @@ export default function RoutesPage() {
                             </button>
                         </div>
                         <div className="flex-1 p-4 bg-gray-100 flex flex-col md:flex-row gap-4">
-                            <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative min-h-[400px]">
+                            <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative min-h-100">
                                 <RouteMapViewer
                                     start={{
                                         lat: viewRoute.inicioLat,
@@ -317,7 +313,7 @@ export default function RoutesPage() {
                             </div>
 
                             {/* Student List Sidebar */}
-                            <div className="w-full md:w-80 bg-white rounded-xl shadow-sm border border-gray-200 p-4 overflow-y-auto max-h-[400px] md:max-h-full">
+                            <div className="w-full md:w-80 bg-white rounded-xl shadow-sm border border-gray-200 p-4 overflow-y-auto max-h-100 md:max-h-full">
                                 <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
                                     <AcademicCapIcon className="w-5 h-5 text-gray-500" />
                                     <span>Estudiantes ({viewRoute.estudiantes?.length || 0})</span>
@@ -351,7 +347,7 @@ export default function RoutesPage() {
 
             {/* Modal Form */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-[1010] overflow-y-auto">
+                <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-1010 overflow-y-auto">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-6">
                             <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -524,7 +520,7 @@ export default function RoutesPage() {
 
             {/* Map Picker Modal - Level 2 */}
             {pickerType && (
-                <div className="fixed inset-0 z-[1010] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-1010 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col">
                         <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
                             <h3 className="font-bold text-gray-900 flex items-center gap-2">
