@@ -75,9 +75,7 @@ export default function AttendancePage() {
             ]);
             setRoutes(routesRes.data);
             setVehicles(vehiclesRes.data);
-        } catch (error) {
-            console.error('Error loading filters:', error);
-        }
+        } catch { }
     };
 
     const loadReport = async () => {
@@ -89,9 +87,7 @@ export default function AttendancePage() {
 
             const res = await api.get(`/attendance/report?${params.toString()}`);
             setReport(res.data);
-        } catch (error) {
-            console.error('Error loading report:', error);
-        } finally {
+        } catch { } finally {
             setLoading(false);
         }
     };
