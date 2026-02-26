@@ -39,9 +39,7 @@ export default function VehiclesPage() {
             ]);
             setVehicles(vehiclesRes.data);
             setConductors(usersRes.data.filter((u: User) => u.role === 'conductor'));
-        } catch (error) {
-            console.error('Error loading data:', error);
-        } finally {
+        } catch { } finally {
             setLoading(false);
         }
     };
