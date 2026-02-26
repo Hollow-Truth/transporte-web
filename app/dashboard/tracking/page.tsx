@@ -163,6 +163,14 @@ export default function TrackingPage() {
             });
         };
 
+        // Escuchar inicio de trayectoria para suscribirse al nuevo vehículo inmediatamente
+        const onTrajectoryStarted = (data: any) => {
+            const vehiculoId = data.vehiculoId || data.vehicleId;
+            if (!vehiculoId) return;
+            socket.emit('join:vehicle', { vehiculoId });
+            activeVehicleIdsRef.current.add(vehiculoId);
+        };
+
         // Escuchar fin de trayectoria para remover vehículo
         const onTrajectoryEnded = (data: any) => {
             const vehiculoId = data.vehiculoId || data.vehicleId;
@@ -178,6 +186,7 @@ export default function TrackingPage() {
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
         socket.on('location:update', onLocationUpdate);
+        socket.on('trajectory:started', onTrajectoryStarted);
         socket.on('trajectory:ended', onTrajectoryEnded);
 
         // Si ya está conectado al montar
@@ -193,6 +202,7 @@ export default function TrackingPage() {
             socket.off('connect', onConnect);
             socket.off('disconnect', onDisconnect);
             socket.off('location:update', onLocationUpdate);
+            socket.off('trajectory:started', onTrajectoryStarted);
             socket.off('trajectory:ended', onTrajectoryEnded);
             // NO llamar disconnectSocket() - el socket es singleton compartido
         };
