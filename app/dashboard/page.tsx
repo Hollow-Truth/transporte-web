@@ -3,13 +3,22 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
-import { TruckIcon, MapIcon, AcademicCapIcon, LocationIcon, UsersIcon, ChartIcon, BellIcon, HomeIcon } from '@/components/icons';
+import { TruckIcon, MapIcon, AcademicCapIcon, LocationIcon, UsersIcon, ChartIcon, BellIcon } from '@/components/icons';
+import api from '@/lib/api';
 import type { User } from '@/types';
+
+interface Stats {
+    vehicles: number;
+    routes: number;
+    students: number;
+    users: number;
+}
 
 export default function DashboardPage() {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [stats, setStats] = useState<Stats | null>(null);
 
     useEffect(() => {
         const token = sessionStorage.getItem('access_token');
@@ -20,8 +29,25 @@ export default function DashboardPage() {
             return;
         }
 
-        setUser(JSON.parse(userData));
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
         setLoading(false);
+
+        if (parsedUser.role === 'admin') {
+            Promise.all([
+                api.get('/vehicles'),
+                api.get('/routes'),
+                api.get('/students'),
+                api.get('/users'),
+            ]).then(([v, r, s, u]) => {
+                setStats({
+                    vehicles: v.data.length,
+                    routes: r.data.length,
+                    students: s.data.length,
+                    users: u.data.length,
+                });
+            }).catch(() => {});
+        }
     }, [router]);
 
     const handleLogout = () => {
@@ -73,21 +99,21 @@ export default function DashboardPage() {
                                     icon={TruckIcon}
                                     description="Gestionar vehículos y conductores"
                                     href="/dashboard/vehicles"
-                                    count="12"
+                                    count={stats?.vehicles}
                                 />
                                 <DashboardCard
                                     title="Rutas"
                                     icon={MapIcon}
                                     description="Administrar rutas y paradas"
                                     href="/dashboard/routes"
-                                    count="8"
+                                    count={stats?.routes}
                                 />
                                 <DashboardCard
                                     title="Estudiantes"
                                     icon={AcademicCapIcon}
                                     description="Gestionar estudiantes y asignaciones"
                                     href="/dashboard/students"
-                                    count="45"
+                                    count={stats?.students}
                                 />
                                 <DashboardCard
                                     title="Tracking GPS"
@@ -100,7 +126,7 @@ export default function DashboardPage() {
                                     icon={UsersIcon}
                                     description="Administrar usuarios del sistema"
                                     href="/dashboard/users"
-                                    count="28"
+                                    count={stats?.users}
                                 />
                                 <DashboardCard
                                     title="Reportes"
@@ -212,7 +238,7 @@ function DashboardCard({
     icon: React.ComponentType<{ className?: string }>;
     description: string;
     href: string;
-    count?: string;
+    count?: string | number;
 }) {
     return (
         <a
@@ -221,7 +247,9 @@ function DashboardCard({
         >
             <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-colors" style={{ backgroundColor: '#dbeafe' }}>
-                    <Icon className="w-6 h-6" style={{ color: '#1e3a8a' }} />
+                    <span style={{ color: '#1e3a8a' }} className="flex items-center justify-center">
+                        <Icon className="w-6 h-6" />
+                    </span>
                 </div>
                 {count && (
                     <span className="text-2xl font-bold text-gray-900">{count}</span>
