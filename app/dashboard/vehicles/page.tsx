@@ -69,7 +69,7 @@ export default function VehiclesPage() {
             año: vehicle.año,
             capacidad: vehicle.capacidad,
             color: vehicle.color,
-            conductorId: vehicle.conductorId,
+            conductorId: vehicle.conductorId ?? '',
         });
         setShowModal(true);
     };
@@ -141,51 +141,53 @@ export default function VehiclesPage() {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Placa</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca/Modelo</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Año</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacidad</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Color</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conductor</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                    <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Placa</th>
+                                    <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><span className="sm:hidden">Modelo</span><span className="hidden sm:inline">Marca/Modelo</span></th>
+                                    <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Año</th>
+                                    <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacidad</th>
+                                    <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Color</th>
+                                    <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conductor</th>
+                                    <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                    <th className="px-2 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {vehicles.map((vehicle) => (
                                     <tr key={vehicle.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900 sticky left-0 bg-white z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.06)]">{vehicle.placa}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-700">{vehicle.marca} {vehicle.modelo}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-700">{vehicle.año}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-700">{vehicle.capacidad} personas</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-3 md:px-6 py-4 whitespace-nowrap font-semibold text-gray-900 sticky left-0 bg-white z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.06)]">{vehicle.placa}</td>
+                                        <td className="px-3 md:px-6 py-4 whitespace-nowrap text-gray-700">{vehicle.marca} {vehicle.modelo}</td>
+                                        <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-gray-700">{vehicle.año}</td>
+                                        <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-gray-700">{vehicle.capacidad} personas</td>
+                                        <td className="hidden lg:table-cell px-6 py-4 whitespace-nowrap">
                                             <span className="inline-flex items-center">
                                                 <span className="w-4 h-4 rounded-full mr-2 border border-gray-300" style={{ backgroundColor: vehicle.color }}></span>
                                                 <span className="text-gray-700">{vehicle.color}</span>
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-700">
+                                        <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-gray-700">
                                             {vehicle.conductor ? `${vehicle.conductor.nombre} ${vehicle.conductor.apellido || ''}` : 'Sin asignar'}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${vehicle.activo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                        <td className="px-3 md:px-6 py-4 whitespace-nowrap">
+                                            <span className={`px-2 md:px-2.5 py-1 text-xs font-medium rounded-full ${vehicle.activo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                                 {vehicle.activo ? 'Activo' : 'Inactivo'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                        <td className="px-2 md:px-6 py-4 whitespace-nowrap text-sm">
                                             <button
                                                 onClick={() => handleEdit(vehicle)}
-                                                className="inline-flex items-center text-blue-600 hover:text-blue-800 mr-3"
+                                                className="inline-flex items-center text-blue-600 hover:text-blue-800 mr-2 md:mr-3"
+                                                title="Editar"
                                             >
-                                                <PencilIcon className="w-4 h-4 mr-1" />
-                                                Editar
+                                                <PencilIcon className="w-4 h-4" />
+                                                <span className="hidden sm:inline ml-1">Editar</span>
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(vehicle.id)}
                                                 className="inline-flex items-center text-red-600 hover:text-red-800"
+                                                title="Eliminar"
                                             >
-                                                <TrashIcon className="w-4 h-4 mr-1" />
-                                                Eliminar
+                                                <TrashIcon className="w-4 h-4" />
+                                                <span className="hidden sm:inline ml-1">Eliminar</span>
                                             </button>
                                         </td>
                                     </tr>
