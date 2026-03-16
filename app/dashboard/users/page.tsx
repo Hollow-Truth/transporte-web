@@ -47,8 +47,7 @@ export default function UsersPage() {
             setLoading(true);
             const response = await api.get('/users');
             setUsers(response.data);
-        } catch (error) {
-            console.error('Error loading users:', error);
+        } catch {
         } finally {
             setLoading(false);
         }
@@ -79,14 +78,12 @@ export default function UsersPage() {
                 const { password, ...updateData } = formData;
                 await api.patch(`/users/${editingUser.id}`, updateData);
             } else {
-                console.log('Sending user data:', formData);
                 await api.post('/users', formData);
             }
             setShowModal(false);
             resetForm();
             loadUsers();
         } catch (error: any) {
-            console.error('Error creating user:', error.response?.data);
             alert(error.response?.data?.message || 'Error al guardar usuario');
         }
     };
