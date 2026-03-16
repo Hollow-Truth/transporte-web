@@ -29,7 +29,7 @@ export default function TrackingPage() {
     const [vehiclePositions, setVehiclePositions] = useState<Map<string, VehiclePosition>>(new Map());
     const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
     const [map, setMap] = useState<any>(null);
-    const [markers, setMarkers] = useState<Map<string, any>>(new Map());
+    const markersRef = useRef<Map<string, any>>(new Map());
     const [isConnected, setIsConnected] = useState(false);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [L, setL] = useState<any>(null);
@@ -129,37 +129,28 @@ export default function TrackingPage() {
 
         // Escuchar actualizaciones de posición
         const onLocationUpdate = (data: any) => {
-
             const vehiculoId = data.vehiculoId || data.vehicleId;
             if (!vehiculoId) return;
 
-            // Extraer coordenadas de diferentes formatos posibles
             const lat = data.location?.lat || data.lat || data.latitude;
             const lng = data.location?.lng || data.lng || data.longitude;
             if (!lat || !lng) return;
 
-            setVehicles((currentVehicles) => {
-                const vehicle = currentVehicles.find((v: Vehicle) => v.id === vehiculoId);
-                const placa = vehicle?.placa || data.placa || 'Desconocido';
+            activeVehicleIdsRef.current.add(vehiculoId);
 
-                const position: VehiclePosition = {
+            setVehiclePositions((prev) => {
+                const existing = prev.get(vehiculoId);
+                const newMap = new Map(prev);
+                newMap.set(vehiculoId, {
                     vehicleId: vehiculoId,
-                    placa,
+                    placa: existing?.placa || data.placa || 'Desconocido',
                     latitude: lat,
                     longitude: lng,
                     speed: data.velocidad || data.speed || 0,
                     heading: data.rumbo || data.heading || 0,
                     timestamp: data.timestamp || new Date().toISOString(),
-                };
-
-                setVehiclePositions((prev) => {
-                    const newMap = new Map(prev);
-                    newMap.set(vehiculoId, position);
-                    return newMap;
                 });
-                activeVehicleIdsRef.current.add(vehiculoId);
-
-                return currentVehicles;
+                return newMap;
             });
         };
 
@@ -249,13 +240,20 @@ export default function TrackingPage() {
     useEffect(() => {
         if (!map || !L) return;
 
-        // Importar función de creación de iconos
         import('@/components/MapView').then(({ createVehicleIcon }) => {
+            // Eliminar marcadores de vehículos que ya no están activos
+            markersRef.current.forEach((marker, vehicleId) => {
+                if (!vehiclePositions.has(vehicleId)) {
+                    marker.remove();
+                    markersRef.current.delete(vehicleId);
+                }
+            });
+
+            // Crear o actualizar marcadores
             vehiclePositions.forEach((position, vehicleId) => {
-                let marker = markers.get(vehicleId);
+                let marker = markersRef.current.get(vehicleId);
 
                 if (!marker) {
-                    // Crear nuevo marcador
                     const icon = createVehicleIcon('#1e3a8a', position.heading);
                     marker = L.marker([position.latitude, position.longitude], { icon })
                         .addTo(map)
@@ -266,21 +264,19 @@ export default function TrackingPage() {
                 <p class="text-xs text-gray-500">${new Date(position.timestamp).toLocaleTimeString()}</p>
               </div>
             `);
-
-                    marker.on('click', () => {
-                        setSelectedVehicle(vehicleId);
-                    });
-
-                    setMarkers((prev) => {
-                        const newMap = new Map(prev);
-                        newMap.set(vehicleId, marker!);
-                        return newMap;
-                    });
+                    marker.on('click', () => setSelectedVehicle(vehicleId));
+                    markersRef.current.set(vehicleId, marker);
                 } else {
-                    // Actualizar posición existente
                     marker.setLatLng([position.latitude, position.longitude]);
                     const icon = createVehicleIcon('#1e3a8a', position.heading);
                     marker.setIcon(icon);
+                    marker.setPopupContent(`
+              <div class="p-2">
+                <p class="font-bold text-gray-900">${position.placa}</p>
+                <p class="text-sm text-gray-600">Velocidad: ${Number(position.speed || 0).toFixed(1)} km/h</p>
+                <p class="text-xs text-gray-500">${new Date(position.timestamp).toLocaleTimeString()}</p>
+              </div>
+            `);
                 }
             });
         });
