@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import { PlusIcon, PencilIcon, TrashIcon } from '@/components/icons';
 import api from '@/lib/api';
+import { toast } from 'sonner';
 import type { Vehicle, User } from '@/types';
 
 export default function VehiclesPage() {
@@ -49,14 +50,16 @@ export default function VehiclesPage() {
         try {
             if (editingVehicle) {
                 await api.patch(`/vehicles/${editingVehicle.id}`, formData);
+                toast.success('Vehículo actualizado');
             } else {
                 await api.post('/vehicles', formData);
+                toast.success('Vehículo guardado exitosamente');
             }
             setShowModal(false);
             resetForm();
             loadData();
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Error al guardar vehículo');
+            toast.error(error.response?.data?.message || 'Error al guardar vehículo');
         }
     };
 
@@ -78,9 +81,10 @@ export default function VehiclesPage() {
         if (!confirm('¿Estás seguro de eliminar este vehículo?')) return;
         try {
             await api.delete(`/vehicles/${id}`);
+            toast.success('Vehículo eliminado');
             loadData();
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Error al eliminar vehículo');
+            toast.error(error.response?.data?.message || 'Error al eliminar vehículo');
         }
     };
 
@@ -98,7 +102,7 @@ export default function VehiclesPage() {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('access_token');
+        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         router.push('/login');
     };
