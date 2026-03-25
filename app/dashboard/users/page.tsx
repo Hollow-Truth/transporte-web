@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import { UsersIcon, PlusIcon, PencilIcon, TrashIcon, SearchIcon } from '@/components/icons';
 import api from '@/lib/api';
+import { toast } from 'sonner';
 import type { User } from '@/types';
 
 export default function UsersPage() {
@@ -77,14 +78,16 @@ export default function UsersPage() {
             if (editingUser) {
                 const { password, ...updateData } = formData;
                 await api.patch(`/users/${editingUser.id}`, updateData);
+                toast.success('Usuario actualizado');
             } else {
                 await api.post('/users', formData);
+                toast.success('Usuario creado exitosamente');
             }
             setShowModal(false);
             resetForm();
             loadUsers();
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Error al guardar usuario');
+            toast.error(error.response?.data?.message || 'Error al guardar usuario');
         }
     };
 
@@ -105,9 +108,10 @@ export default function UsersPage() {
         if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
         try {
             await api.delete(`/users/${id}`);
+            toast.success('Usuario eliminado');
             loadUsers();
         } catch (error) {
-            alert('Error al eliminar usuario');
+            toast.error('Error al eliminar usuario');
         }
     };
 
@@ -124,7 +128,7 @@ export default function UsersPage() {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('access_token');
+        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         router.push('/login');
     };
