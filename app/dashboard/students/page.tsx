@@ -6,6 +6,7 @@ import Sidebar from '@/components/Sidebar';
 import { PlusIcon, PencilIcon, TrashIcon, LocationIcon, MapIcon, XIcon } from '@/components/icons';
 import dynamic from 'next/dynamic';
 import api from '@/lib/api';
+import { toast } from 'sonner';
 
 const MapPicker = dynamic(() => import('@/components/MapPicker'), { ssr: false });
 import type { Student, User, Route } from '@/types';
@@ -71,16 +72,23 @@ export default function StudentsPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const payload = {
+                ...formData,
+                padreId: formData.padreId || undefined,
+                rutaId: formData.rutaId || undefined,
+            };
             if (editingStudent) {
-                await api.patch(`/students/${editingStudent.id}`, formData);
+                await api.patch(`/students/${editingStudent.id}`, payload);
+                toast.success('Alumno actualizado');
             } else {
-                await api.post('/students', formData);
+                await api.post('/students', payload);
+                toast.success('Alumno guardado exitosamente');
             }
             setShowModal(false);
             resetForm();
             loadData();
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Error al guardar estudiante');
+            toast.error(error.response?.data?.message || 'Error al guardar estudiante');
         }
     };
 
@@ -106,9 +114,10 @@ export default function StudentsPage() {
         if (!confirm('¿Estás seguro de eliminar este estudiante?')) return;
         try {
             await api.delete(`/students/${id}`);
+            toast.success('Alumno eliminado');
             loadData();
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Error al eliminar estudiante');
+            toast.error(error.response?.data?.message || 'Error al eliminar estudiante');
         }
     };
 
@@ -130,7 +139,7 @@ export default function StudentsPage() {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('access_token');
+        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         router.push('/login');
     };
@@ -168,20 +177,20 @@ export default function StudentsPage() {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <p className="text-gray-600 text-sm mb-1">Total Estudiantes</p>
-                            <p className="text-3xl font-bold text-gray-900">{students.length}</p>
+                    <div className="grid grid-cols-3 gap-3 md:gap-6 mb-8">
+                        <div className="bg-white rounded-2xl border border-gray-200 p-3 md:p-6">
+                            <p className="text-gray-600 text-xs md:text-sm mb-1">Total</p>
+                            <p className="text-2xl md:text-3xl font-bold text-gray-900">{students.length}</p>
                         </div>
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <p className="text-gray-600 text-sm mb-1">Con Ruta Asignada</p>
-                            <p className="text-3xl font-bold text-green-600">
+                        <div className="bg-white rounded-2xl border border-gray-200 p-3 md:p-6">
+                            <p className="text-gray-600 text-xs md:text-sm mb-1">Con Ruta</p>
+                            <p className="text-2xl md:text-3xl font-bold text-green-600">
                                 {students.filter(s => s.rutaId).length}
                             </p>
                         </div>
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <p className="text-gray-600 text-sm mb-1">Sin Ruta</p>
-                            <p className="text-3xl font-bold text-orange-600">
+                        <div className="bg-white rounded-2xl border border-gray-200 p-3 md:p-6">
+                            <p className="text-gray-600 text-xs md:text-sm mb-1">Sin Ruta</p>
+                            <p className="text-2xl md:text-3xl font-bold text-orange-600">
                                 {students.filter(s => !s.rutaId).length}
                             </p>
                         </div>
@@ -193,25 +202,25 @@ export default function StudentsPage() {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Nombre</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Nac.</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Padre</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ruta</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                    <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Nombre</th>
+                                    <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Nac.</th>
+                                    <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>
+                                    <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Padre</th>
+                                    <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ruta</th>
+                                    <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                    <th className="px-2 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {students.map((student) => (
                                     <tr key={student.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900 sticky left-0 bg-white z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.06)]">
+                                        <td className="px-3 md:px-6 py-4 whitespace-nowrap font-semibold text-gray-900 sticky left-0 bg-white z-10 shadow-[2px_0_4px_-2px_rgba(0,0,0,0.06)]">
                                             {student.nombre} {student.apellido}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-700">
+                                        <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-gray-700">
                                             {new Date(student.fechaNacimiento).toLocaleDateString()}
                                         </td>
-                                        <td className="px-6 py-4 text-gray-700">
+                                        <td className="hidden lg:table-cell px-6 py-4 text-gray-700">
                                             {student.direccion}
                                             {student.latitud && (
                                                 <div className="flex items-center gap-1 text-xs text-blue-600 mt-1">
@@ -220,31 +229,33 @@ export default function StudentsPage() {
                                                 </div>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-700">
+                                        <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-gray-700">
                                             {student.padre ? `${student.padre.nombre} ${student.padre.apellido || ''}` : 'Sin asignar'}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-700">
+                                        <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-gray-700">
                                             {student.ruta ? student.ruta.nombre : 'Sin ruta'}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${student.activo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                        <td className="px-3 md:px-6 py-4 whitespace-nowrap">
+                                            <span className={`px-2 md:px-2.5 py-1 text-xs font-medium rounded-full ${student.activo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                                 {student.activo ? 'Activo' : 'Inactivo'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                        <td className="px-2 md:px-6 py-4 whitespace-nowrap text-sm">
                                             <button
                                                 onClick={() => handleEdit(student)}
-                                                className="inline-flex items-center text-blue-600 hover:text-blue-800 mr-3"
+                                                className="inline-flex items-center text-blue-600 hover:text-blue-800 mr-2 md:mr-3"
+                                                title="Editar"
                                             >
-                                                <PencilIcon className="w-4 h-4 mr-1" />
-                                                Editar
+                                                <PencilIcon className="w-4 h-4" />
+                                                <span className="hidden sm:inline ml-1">Editar</span>
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(student.id)}
                                                 className="inline-flex items-center text-red-600 hover:text-red-800"
+                                                title="Eliminar"
                                             >
-                                                <TrashIcon className="w-4 h-4 mr-1" />
-                                                Eliminar
+                                                <TrashIcon className="w-4 h-4" />
+                                                <span className="hidden sm:inline ml-1">Eliminar</span>
                                             </button>
                                         </td>
                                     </tr>
