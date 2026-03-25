@@ -7,6 +7,7 @@ import { PlusIcon, PencilIcon, TrashIcon, XIcon, MapIcon, EyeIcon, TruckIcon, Ac
 import api from '@/lib/api';
 import type { Route, Vehicle, User } from '@/types';
 import dynamic from 'next/dynamic';
+import { toast } from 'sonner';
 
 // Cargar MapPicker dinámicamente sin SSR
 const MapPicker = dynamic(() => import('@/components/MapPicker'), {
@@ -61,6 +62,7 @@ export default function RoutesPage() {
 
     // Control de modales de mapa
     const [pickerType, setPickerType] = useState<'inicio' | 'destino' | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [viewRoute, setViewRoute] = useState<any | null>(null);
     const routeMapRef = useRef<any>(null);
 
@@ -83,19 +85,20 @@ export default function RoutesPage() {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         // Validaciones básicas
         if (!formData.inicioLat || !formData.inicioLng) {
-            alert('Por favor selecciona un Punto de Inicio en el mapa');
+            toast.error('Por favor selecciona un Punto de Inicio en el mapa');
             return;
         }
         if (!formData.destinoLat || !formData.destinoLng) {
-            alert('Por favor selecciona un Punto de Destino en el mapa');
+            toast.error('Por favor selecciona un Punto de Destino en el mapa');
             return;
         }
 
+        setIsSubmitting(true);
         try {
             // Limpiar datos antes de enviar
             const payload = { ...formData };
@@ -105,14 +108,19 @@ export default function RoutesPage() {
 
             if (editingRoute) {
                 await api.patch(`/routes/${editingRoute.id}`, payload);
+                toast.success('Ruta actualizada');
             } else {
                 await api.post('/routes', payload);
+                toast.success('Ruta creada exitosamente');
             }
             setShowModal(false);
             resetForm();
             loadData();
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Error al guardar ruta');
+            const msg = error.response?.data?.message;
+            toast.error(Array.isArray(msg) ? msg.join('\n') : (msg || 'Error al guardar ruta'));
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -121,8 +129,8 @@ export default function RoutesPage() {
         setFormData({
             nombre: route.nombre || '',
             descripcion: route.descripcion || '',
-            horaInicio: route.horaInicio || '',
-            horaFin: route.horaFin || '',
+            horaInicio: (route.horaInicio || '').slice(0, 5),
+            horaFin: (route.horaFin || '').slice(0, 5),
             vehiculoId: route.vehiculoId || '',
             inicioLat: route.inicioLat || 0,
             inicioLng: route.inicioLng || 0,
@@ -138,9 +146,10 @@ export default function RoutesPage() {
         if (!confirm('¿Estás seguro de eliminar esta ruta?')) return;
         try {
             await api.delete(`/routes/${id}`);
+            toast.success('Ruta eliminada');
             loadData();
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Error al eliminar ruta');
+            toast.error(error.response?.data?.message || 'Error al eliminar ruta');
         }
     };
 
@@ -151,7 +160,7 @@ export default function RoutesPage() {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('access_token');
+        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         router.push('/login');
     };
@@ -382,7 +391,6 @@ export default function RoutesPage() {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Hora Inicio *</label>
                                         <input
                                             type="time"
-                                            required
                                             value={formData.horaInicio}
                                             onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
                                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
@@ -392,7 +400,6 @@ export default function RoutesPage() {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Hora Fin *</label>
                                         <input
                                             type="time"
-                                            required
                                             value={formData.horaFin}
                                             onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
                                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
@@ -507,9 +514,10 @@ export default function RoutesPage() {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-1 py-3 px-4 bg-primary hover:bg-primary-hover text-white rounded-xl font-medium transition shadow-lg shadow-blue-900/20"
+                                        disabled={isSubmitting}
+                                        className="flex-1 py-3 px-4 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl font-medium transition shadow-lg shadow-blue-900/20"
                                     >
-                                        {editingRoute ? 'Guardar Cambios' : 'Crear Ruta'}
+                                        {isSubmitting ? 'Guardando...' : (editingRoute ? 'Guardar Cambios' : 'Crear Ruta')}
                                     </button>
                                 </div>
                             </form>
