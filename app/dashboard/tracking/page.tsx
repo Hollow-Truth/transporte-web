@@ -294,7 +294,7 @@ export default function TrackingPage() {
     }, [selectedVehicle, map, vehiclePositions]);
 
     const handleLogout = () => {
-        sessionStorage.removeItem('access_token');
+        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         router.push('/login');
     };

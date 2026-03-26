@@ -364,8 +364,13 @@ export default function UsersPage() {
                                         type="tel"
                                         value={formData.telefono}
                                         onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                                        pattern="[67][0-9]{7}"
+                                        maxLength={8}
+                                        placeholder="70000000"
+                                        title="8 dígitos, debe empezar con 6 o 7"
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
+                                    <p className="text-xs text-gray-400 mt-1">8 dígitos, empieza con 6 o 7</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Rol *</label>

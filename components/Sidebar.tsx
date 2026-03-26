@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { HomeIcon, TruckIcon, MapIcon, AcademicCapIcon, UsersIcon, LocationIcon, ChartIcon, BellIcon, LogoutIcon, MenuIcon, XIcon } from './icons';
 import type { User } from '@/types';
@@ -13,6 +13,22 @@ interface SidebarProps {
 export default function Sidebar({ user, onLogout }: SidebarProps) {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
+    const [osrmStatus, setOsrmStatus] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        const check = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/api/health`);
+                const data = await res.json();
+                setOsrmStatus(data.osrm);
+            } catch {
+                setOsrmStatus(false);
+            }
+        };
+        check();
+        const interval = setInterval(check, 30000);
+        return () => clearInterval(interval);
+    }, []);
 
     const adminLinks = [
         { href: '/dashboard', label: 'Dashboard', icon: HomeIcon },
@@ -122,6 +138,21 @@ export default function Sidebar({ user, onLogout }: SidebarProps) {
                     })}
                 </nav>
 
+                {/* Estado OSRM */}
+                <div className="px-4 py-2 border-t border-gray-100">
+                    <div className="flex items-center space-x-2">
+                        <span
+                            className={`w-2 h-2 rounded-full shrink-0 ${
+                                osrmStatus === null ? 'bg-gray-300' :
+                                osrmStatus ? 'bg-green-500' : 'bg-red-500'
+                            }`}
+                        />
+                        <span className="text-xs text-gray-400">
+                            OSRM {osrmStatus === null ? 'verificando...' : osrmStatus ? 'activo' : 'inactivo'}
+                        </span>
+                    </div>
+                </div>
+
                 {/* Logout */}
                 <div className="p-4 border-t border-gray-200">
                     <button
@@ -137,7 +168,7 @@ export default function Sidebar({ user, onLogout }: SidebarProps) {
             {/* Overlay for mobile */}
             {isOpen && (
                 <div
-                    className="lg:hidden fixed inset-0 bg-transparent z-[1001]"
+                    className="lg:hidden fixed inset-0 bg-black/40 z-1001"
                     onClick={() => setIsOpen(false)}
                 />
             )}

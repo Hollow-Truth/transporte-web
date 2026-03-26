@@ -21,7 +21,7 @@ export default function DashboardPage() {
     const [stats, setStats] = useState<Stats | null>(null);
 
     useEffect(() => {
-        const token = sessionStorage.getItem('access_token');
+        const token = localStorage.getItem('access_token');
         const userData = localStorage.getItem('user');
 
         if (!token || !userData) {
@@ -51,7 +51,7 @@ export default function DashboardPage() {
     }, [router]);
 
     const handleLogout = () => {
-        sessionStorage.removeItem('access_token');
+        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         router.push('/login');
     };

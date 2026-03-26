@@ -63,9 +63,29 @@ export default function RouteMapViewer({ start, end, stops = [], routeGeometry, 
         const map = L.map(containerRef.current);
         mapRef.current = map;
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+        L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://stamen.com/">Stamen Design</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 20,
         }).addTo(map);
+
+        const filterId = 'blue-map-filter';
+        if (!document.getElementById(filterId)) {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+            svg.innerHTML = `<defs>
+              <filter id="${filterId}" color-interpolation-filters="sRGB">
+                <feColorMatrix type="matrix" values="
+                  0.248 0.248 0.248 0 0.118
+                  0.222 0.222 0.222 0 0.227
+                  0.133 0.133 0.133 0 0.541
+                  0     0     0     1 0
+                "/>
+              </filter>
+            </defs>`;
+            document.body.appendChild(svg);
+        }
+        const tilePane = map.getPanes().tilePane;
+        tilePane.style.filter = `url(#${filterId})`;
 
         // Add School Marker (fixed location)
         L.marker([COLEGIO_LAT, COLEGIO_LNG], { icon: schoolIcon })

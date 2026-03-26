@@ -8,6 +8,25 @@ import api from '@/lib/api';
 import { toast } from 'sonner';
 import type { Vehicle, User } from '@/types';
 
+const COLORES = [
+    { nombre: 'Amarillo',  hex: '#EAB308' },
+    { nombre: 'Azul',      hex: '#2563EB' },
+    { nombre: 'Blanco',    hex: '#F3F4F6' },
+    { nombre: 'Celeste',   hex: '#7DD3FC' },
+    { nombre: 'Dorado',    hex: '#B45309' },
+    { nombre: 'Gris',      hex: '#6B7280' },
+    { nombre: 'Naranja',   hex: '#EA580C' },
+    { nombre: 'Negro',     hex: '#1F2937' },
+    { nombre: 'Plateado',  hex: '#9CA3AF' },
+    { nombre: 'Rojo',      hex: '#DC2626' },
+    { nombre: 'Verde',     hex: '#16A34A' },
+    { nombre: 'Vino',      hex: '#7F1D1D' },
+] as const;
+
+function getColorHex(nombre: string): string {
+    return COLORES.find(c => c.nombre === nombre)?.hex ?? '#9CA3AF';
+}
+
 export default function VehiclesPage() {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
@@ -164,7 +183,7 @@ export default function VehiclesPage() {
                                         <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-gray-700">{vehicle.capacidad} personas</td>
                                         <td className="hidden lg:table-cell px-6 py-4 whitespace-nowrap">
                                             <span className="inline-flex items-center">
-                                                <span className="w-4 h-4 rounded-full mr-2 border border-gray-300" style={{ backgroundColor: vehicle.color }}></span>
+                                                <span className="w-4 h-4 rounded-full mr-2 border border-gray-300" style={{ backgroundColor: getColorHex(vehicle.color) }}></span>
                                                 <span className="text-gray-700">{vehicle.color}</span>
                                             </span>
                                         </td>
@@ -268,14 +287,23 @@ export default function VehiclesPage() {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Color *</label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={formData.color}
-                                            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            placeholder="Blanco"
-                                        />
+                                        <div className="relative">
+                                            <span
+                                                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-gray-300"
+                                                style={{ backgroundColor: getColorHex(formData.color) }}
+                                            />
+                                            <select
+                                                required
+                                                value={formData.color}
+                                                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                                                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                <option value="">Seleccionar color</option>
+                                                {COLORES.map(c => (
+                                                    <option key={c.nombre} value={c.nombre}>{c.nombre}</option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </div>
                                     <div className="col-span-2">
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Conductor *</label>

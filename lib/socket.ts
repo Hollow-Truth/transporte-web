@@ -4,7 +4,7 @@ let socket: Socket | null = null;
 
 export const getSocket = () => {
     if (!socket) {
-        const token = sessionStorage.getItem('access_token');
+        const token = localStorage.getItem('access_token');
 
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
         const socketUrl = apiUrl.replace('/api', '');

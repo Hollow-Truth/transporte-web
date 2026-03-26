@@ -34,11 +34,30 @@ export default function MapView({
         // Crear mapa
         const map = L.map(containerRef.current).setView(center, zoom);
 
-        // Agregar capa de tiles (OpenStreetMap)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 19,
+        L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://stamen.com/">Stamen Design</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 20,
         }).addTo(map);
+
+        // SVG feColorMatrix: mapeo preciso blanco→azul claro, negro→navy (#1e3a8a)
+        const filterId = 'blue-map-filter';
+        if (!document.getElementById(filterId)) {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+            svg.innerHTML = `<defs>
+              <filter id="${filterId}" color-interpolation-filters="sRGB">
+                <feColorMatrix type="matrix" values="
+                  0.248 0.248 0.248 0 0.118
+                  0.222 0.222 0.222 0 0.227
+                  0.133 0.133 0.133 0 0.541
+                  0     0     0     1 0
+                "/>
+              </filter>
+            </defs>`;
+            document.body.appendChild(svg);
+        }
+        const tilePane = map.getPanes().tilePane;
+        tilePane.style.filter = `url(#${filterId})`;
 
         mapRef.current = map;
 

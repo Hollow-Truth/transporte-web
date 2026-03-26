@@ -304,8 +304,10 @@ export default function StudentsPage() {
                                             required
                                             value={formData.fechaNacimiento}
                                             onChange={(e) => setFormData({ ...formData, fechaNacimiento: e.target.value })}
+                                            max={(() => { const d = new Date(); d.setFullYear(d.getFullYear() - 4); return d.toISOString().split('T')[0]; })()}
                                             className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         />
+                                        <p className="text-xs text-gray-400 mt-1">Mínimo 4 años de edad</p>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Padre *</label>

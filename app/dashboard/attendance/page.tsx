@@ -6,6 +6,8 @@ import Sidebar from '@/components/Sidebar';
 import { ClipboardIcon } from '@/components/icons';
 import api from '@/lib/api';
 import type { User, Route, Vehicle } from '@/types';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface AttendanceRecord {
     id: string;
@@ -92,8 +94,59 @@ export default function AttendancePage() {
         }
     };
 
+    const exportPDF = () => {
+        if (!report) return;
+
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+
+        // Encabezado
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Reporte de Asistencia', pageWidth / 2, 18, { align: 'center' });
+
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Fecha: ${report.fecha}`, pageWidth / 2, 26, { align: 'center' });
+
+        // Resumen
+        const s = report.resumen;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Resumen', 14, 36);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Total registros: ${s.totalRegistros}   Abordajes: ${s.abordajes}   Descensos: ${s.descensos}   Validados: ${s.validados}   Sospechosos: ${s.sospechosos}`, 14, 43);
+
+        // Tabla
+        autoTable(doc, {
+            startY: 50,
+            head: [['Hora', 'Estudiante', 'Grado', 'Evento', 'Vehículo', 'Distancia', 'Geofencing']],
+            body: report.registros.map((r) => [
+                new Date(r.timestamp).toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                `${r.estudiante.nombre} ${r.estudiante.apellido}`,
+                r.estudiante.grado || '-',
+                r.evento === 'abordaje' ? 'Abordaje' : 'Descenso',
+                r.vehiculo?.placa || '-',
+                r.distanciaDomicilio !== null ? `${Math.round(r.distanciaDomicilio)}m` : '-',
+                r.sospechoso ? 'Sospechoso' : r.validadoGeofencing ? 'Validado' : r.manualOverride ? 'Manual' : 'No validado',
+            ]),
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [30, 58, 138] },
+            alternateRowStyles: { fillColor: [239, 246, 255] },
+            didParseCell: (data) => {
+                if (data.section === 'body' && data.column.index === 6) {
+                    const val = data.cell.raw as string;
+                    if (val === 'Sospechoso') data.cell.styles.textColor = [220, 38, 38];
+                    else if (val === 'Validado') data.cell.styles.textColor = [22, 163, 74];
+                }
+            },
+        });
+
+        doc.save(`asistencia-${report.fecha}.pdf`);
+    };
+
     const handleLogout = () => {
-        sessionStorage.removeItem('access_token');
+        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         router.push('/login');
     };
@@ -115,9 +168,21 @@ export default function AttendancePage() {
             <div className="flex-1 overflow-y-auto pt-16 lg:pt-0">
                 <div className="max-w-7xl mx-auto px-8 py-8">
                     {/* Header */}
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900">Control de Asistencia</h1>
-                        <p className="text-gray-600 mt-1">Registro de abordajes, descensos y validación geoespacial</p>
+                    <div className="mb-8 flex items-start justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">Control de Asistencia</h1>
+                            <p className="text-gray-600 mt-1">Registro de abordajes, descensos y validación geoespacial</p>
+                        </div>
+                        <button
+                            onClick={exportPDF}
+                            disabled={!report?.registros.length}
+                            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Exportar PDF
+                        </button>
                     </div>
 
                     {/* Filters */}
